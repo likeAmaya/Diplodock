@@ -15,6 +15,8 @@ using namespace System::Windows::Forms;
 
 namespace OpenGLForm 
 {
+	public enum class LighterType { Parallel, Omni, Spot, No };
+
 	public ref class COpenGL: public System::Windows::Forms::NativeWindow
 	{
 	public:
@@ -58,11 +60,11 @@ namespace OpenGLForm
 			glLoadIdentity();									// Reset the current modelview matrix
 			//glTranslatef(-1.5f,0.0f,-6.0f);						// Move left 1.5 units and into the screen 6.0
 
-			glTranslatef(_xTranslate, _yTranslate, _zTranslate);
-			glRotatef(_xRotate, 1.0f, 0.0f, 0.0f);
-			glRotatef(_yRotate, 0.0f, 1.0f, 0.0f);
-			glRotatef(_zRotate, 0.0f, 0.0f, 1.0f);
-			glScalef(_xScale, _yScale, _zScale);
+			glTranslatef(_xTriangleTranslate, _yTriangleTranslate, _zTriangleTranslate);
+			glRotatef(_xTriangleRotate, 1.0f, 0.0f, 0.0f);
+			glRotatef(_yTriangleRotate, 0.0f, 1.0f, 0.0f);
+			glRotatef(_zTriangleRotate, 0.0f, 0.0f, 1.0f);
+			glScalef(_xTriangleScale, _yTriangleScale, _zTriangleScale);
 
 			//glRotatef(rtri,0.0f,1.0f,0.0f);						// Rotate the triangle on the y axis 
 			glBegin(GL_TRIANGLES);								// Start drawing a triangle
@@ -93,8 +95,85 @@ namespace OpenGLForm
 			glEnd();											// Done drawing the pyramid
 
 			glLoadIdentity();									// Reset the current modelview matrix
-			glTranslatef(1.5f,0.0f,-7.0f);						// Move right 1.5 units and into the screen 7.0
+			//glTranslatef(1.5f,0.0f,-7.0f);						// Move right 1.5 units and into the screen 7.0
 			//glRotatef(rquad,1.0f,1.0f,1.0f);					// Rotate the quad on the x axis 
+
+			
+
+			glTranslatef(_xCubeTranslate, _yCubeTranslate, _zCubeTranslate);
+			glRotatef(_xCubeRotate, 1.0f, 0.0f, 0.0f);
+			glRotatef(_yCubeRotate, 0.0f, 1.0f, 0.0f);
+			glRotatef(_zCubeRotate, 0.0f, 0.0f, 1.0f);
+			glScalef(_xCubeScale, _yCubeScale, _zCubeScale);
+
+			GLfloat mat1_ambient[] = { 0.19225f, 0.19225f, 0.19225f };
+			float mat1_diffuse[] = { 0.50754f, 0.50754f, 0.50754f };
+			float mat1_specular[] = { 0.508273f, 0.508273f, 0.508273f };
+			float mat1_shininess = 0.4f;
+
+			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat1_ambient);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat1_diffuse);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat1_specular);
+			glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat1_shininess);
+
+			if (_currentLighter == LighterType::No)
+			{
+				glDisable(GL_LIGHTING);
+				glDisable(GL_LIGHT0);
+				glDisable(GL_LIGHT2);
+				glDisable(GL_LIGHT4);
+			}
+			else if (_currentLighter == LighterType::Parallel) 
+			{
+				// направленный источник света
+				GLfloat light0_diffuse[] = { 0.4, 0.7, 0.2 }; // цвет
+				GLfloat light0_direction[] = { 0.0, 0.0, 1.0, 0.0 };
+				glEnable(GL_LIGHTING);
+				glEnable(GL_LIGHT0);
+				glDisable(GL_LIGHT2);
+				glDisable(GL_LIGHT4);
+				glLightfv(GL_LIGHT0, GL_DIFFUSE, light0_diffuse);
+				glLightfv(GL_LIGHT0, GL_POSITION, light0_direction);
+			}
+			else if (_currentLighter == LighterType::Omni)
+			{
+				// точечный источник света
+				// убывание интенсивности с расстоянием
+				// задано функцией f(d) = 1.0 / (0.4 * d * d + 0.2 * d)
+				GLfloat light2_diffuse[] = { 0.4, 0.7, 0.2 };
+				GLfloat light2_position[] = { 0.0, 0.0, 1.0, 1.0 };
+				glEnable(GL_LIGHTING);
+				glEnable(GL_LIGHT2);
+				glDisable(GL_LIGHT0);
+				glDisable(GL_LIGHT4);
+				glLightfv(GL_LIGHT2, GL_DIFFUSE, light2_diffuse);
+				glLightfv(GL_LIGHT2, GL_POSITION, light2_position);
+				glLightf(GL_LIGHT2, GL_CONSTANT_ATTENUATION, 0.0);
+				glLightf(GL_LIGHT2, GL_LINEAR_ATTENUATION, 0.2);
+				glLightf(GL_LIGHT2, GL_QUADRATIC_ATTENUATION, 0.4);
+			}
+			else if (_currentLighter == LighterType::Spot)
+			{
+				// прожектор
+				// убывание интенсивности с расстоянием
+				// отключено (по умолчанию)
+				// половина угла при вершине 30 градусов
+				// направление на центр плоскости
+				// включен рассчет убывания интенсивности для прожектора
+				GLfloat light4_diffuse[] = { 0.4, 0.7, 0.2 };
+				GLfloat light4_position[] = { 0.0, 0.0, 1.0, 1.0 };
+				GLfloat light4_spot_direction[] = { 0.0, 0.0, -1.0 };
+				glEnable(GL_LIGHTING);
+				glEnable(GL_LIGHT4);
+				glDisable(GL_LIGHT0);
+				glDisable(GL_LIGHT2);
+				glLightfv(GL_LIGHT4, GL_DIFFUSE, light4_diffuse);
+				glLightfv(GL_LIGHT4, GL_POSITION, light4_position);
+				glLightf(GL_LIGHT4, GL_SPOT_CUTOFF, 30);
+				glLightfv(GL_LIGHT4, GL_SPOT_DIRECTION, light4_spot_direction);
+				glLightf(GL_LIGHT4, GL_SPOT_EXPONENT, 15.0);
+			}
+
 			glBegin(GL_QUADS);									// Draw a quad
 				glColor3f(0.0f,1.0f,0.0f);						// Set The color to green
 				glVertex3f( 1.0f, 1.0f,-1.0f);					// Top Right of the quad (top)
@@ -138,9 +217,21 @@ namespace OpenGLForm
 		}
 
 	public: 
-		GLfloat _xTranslate = 0.0f, _yTranslate = 0.0f, _zTranslate = -6.0f;
-		GLfloat _xRotate = 0.0f, _yRotate = 0.0f, _zRotate = 0.0f;
-		GLfloat _xScale = 1.0f, _yScale = 1.0f, _zScale = 1.0f;
+		GLfloat _xCubeTranslate = 0.0f, _yCubeTranslate = 0.0f, _zCubeTranslate = -6.0f;
+		GLfloat _xCubeRotate = 0.0f, _yCubeRotate = 0.0f, _zCubeRotate = 0.0f;
+		GLfloat _xCubeScale = 1.0f, _yCubeScale = 1.0f, _zCubeScale = 1.0f;
+
+		GLfloat _xTriangleTranslate = 1.5f, _yTriangleTranslate = 0.0f, _zTriangleTranslate = -7.0f;
+		GLfloat _xTriangleRotate = 0.0f, _yTriangleRotate = 0.0f, _zTriangleRotate = 0.0f;
+		GLfloat _xTriangleScale = 1.0f, _yTriangleScale = 1.0f, _zTriangleScale = 1.0f;
+
+		LighterType _currentLighter = LighterType::No;
+
+		bool _isCubeSelected = true;
+		bool _isProjectorLighterActive = false;
+		bool _isDirectedLighterActive = false;
+		bool _isSpotLighterActive = false;
+
 
 	private:
 		HDC m_hDC;
@@ -218,6 +309,13 @@ namespace OpenGLForm
 			glEnable(GL_DEPTH_TEST);							// Enables depth testing
 			glDepthFunc(GL_LEQUAL);								// The type of depth testing to do
 			glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);	// Really nice perspective calculations
+
+			glEnable(GL_LIGHTING);
+			// двухсторонний расчет освещения
+			glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+			// автоматическое приведение нормалей к
+			// единичной длине
+			glEnable(GL_NORMALIZE);
 			return TRUE;										// Initialisation went ok
 		}
 
