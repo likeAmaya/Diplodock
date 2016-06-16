@@ -106,15 +106,18 @@ namespace OpenGLForm
 			glRotatef(_zCubeRotate, 0.0f, 0.0f, 1.0f);
 			glScalef(_xCubeScale, _yCubeScale, _zCubeScale);
 
-			GLfloat mat1_ambient[] = { 0.19225f, 0.19225f, 0.19225f };
-			float mat1_diffuse[] = { 0.50754f, 0.50754f, 0.50754f };
-			float mat1_specular[] = { 0.508273f, 0.508273f, 0.508273f };
-			float mat1_shininess = 0.4f;
+			// Materials
+			float material_Ka[] = { 0.5f, 0.0f, 0.0f, 1.0f };
+			float material_Kd[] = { 0.4f, 0.4f, 0.5f, 1.0f };
+			float material_Ks[] = { 0.8f, 0.8f, 0.0f, 1.0f };
+			float material_Ke[] = { 0.1f, 0.0f, 0.0f, 0.0f };
+			float material_Se = 20.0f;
 
-			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat1_ambient);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat1_diffuse);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat1_specular);
-			glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat1_shininess);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, material_Ka);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, material_Kd);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, material_Ks);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, material_Ke);
+			glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, material_Se);
 
 			if (_currentLighter == LighterType::No)
 			{
