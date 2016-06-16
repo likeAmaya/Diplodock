@@ -162,7 +162,7 @@ namespace OpenGLForm
 				// включен рассчет убывания интенсивности для прожектора
 				GLfloat light4_diffuse[] = { 0.4, 0.7, 0.2 };
 				GLfloat light4_position[] = { 0.0, 0.0, 1.0, 1.0 };
-				GLfloat light4_spot_direction[] = { 0.0, 0.0, -1.0 };
+				GLfloat light4_spot_direction[] = { 1.0, -1.0, -1.0 };
 				glEnable(GL_LIGHTING);
 				glEnable(GL_LIGHT4);
 				glDisable(GL_LIGHT0);
