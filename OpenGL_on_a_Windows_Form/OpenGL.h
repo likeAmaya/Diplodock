@@ -8,7 +8,10 @@
 //#include <GL/freeglut.h>
 
 
+#include "Form1.h"
+
 using namespace System::Windows::Forms;
+
 
 namespace OpenGLForm 
 {
@@ -53,8 +56,15 @@ namespace OpenGLForm
 			
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear screen and depth buffer
 			glLoadIdentity();									// Reset the current modelview matrix
-			glTranslatef(-1.5f,0.0f,-6.0f);						// Move left 1.5 units and into the screen 6.0
-			glRotatef(rtri,0.0f,1.0f,0.0f);						// Rotate the triangle on the y axis 
+			//glTranslatef(-1.5f,0.0f,-6.0f);						// Move left 1.5 units and into the screen 6.0
+
+			glTranslatef(_xTranslate, _yTranslate, _zTranslate);
+			glRotatef(_xRotate, 1.0f, 0.0f, 0.0f);
+			glRotatef(_yRotate, 0.0f, 1.0f, 0.0f);
+			glRotatef(_zRotate, 0.0f, 0.0f, 1.0f);
+			glScalef(_xScale, _yScale, _zScale);
+
+			//glRotatef(rtri,0.0f,1.0f,0.0f);						// Rotate the triangle on the y axis 
 			glBegin(GL_TRIANGLES);								// Start drawing a triangle
 				glColor3f(1.0f,0.0f,0.0f);						// Red
 				glVertex3f( 0.0f, 1.0f, 0.0f);					// Top Of triangle (front)
@@ -84,7 +94,7 @@ namespace OpenGLForm
 
 			glLoadIdentity();									// Reset the current modelview matrix
 			glTranslatef(1.5f,0.0f,-7.0f);						// Move right 1.5 units and into the screen 7.0
-			glRotatef(rquad,1.0f,1.0f,1.0f);					// Rotate the quad on the x axis 
+			//glRotatef(rquad,1.0f,1.0f,1.0f);					// Rotate the quad on the x axis 
 			glBegin(GL_QUADS);									// Draw a quad
 				glColor3f(0.0f,1.0f,0.0f);						// Set The color to green
 				glVertex3f( 1.0f, 1.0f,-1.0f);					// Top Right of the quad (top)
@@ -118,14 +128,19 @@ namespace OpenGLForm
 				glVertex3f( 1.0f,-1.0f,-1.0f);					// Bottom right of the quad (right)
 			glEnd();											// Done drawing the quad
 
-			rtri+=0.2f;											// Increase the rotation variable for the triangle
-			rquad-=0.15f;										// Decrease the rotation variable for the quad
+			//rtri+=0.2f;											// Increase the rotation variable for the triangle
+			//rquad-=0.15f;										// Decrease the rotation variable for the quad
 		}
 
 		System::Void SwapOpenGLBuffers(System::Void)
 		{
 			SwapBuffers(m_hDC) ;
 		}
+
+	public: 
+		GLfloat _xTranslate = 0.0f, _yTranslate = 0.0f, _zTranslate = -6.0f;
+		GLfloat _xRotate = 0.0f, _yRotate = 0.0f, _zRotate = 0.0f;
+		GLfloat _xScale = 1.0f, _yScale = 1.0f, _zScale = 1.0f;
 
 	private:
 		HDC m_hDC;
